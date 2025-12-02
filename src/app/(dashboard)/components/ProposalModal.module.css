@@ -1,0 +1,100 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.16), transparent 55%),
+    rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(18px);
+  z-index: 40;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.98))
+      padding-box,
+    linear-gradient(
+        135deg,
+        rgba(56, 189, 248, 0.75),
+        rgba(129, 230, 217, 0.4),
+        rgba(56, 189, 248, 0.9)
+      )
+      border-box;
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 1);
+  overflow: hidden;
+  animation: modalEnter 220ms cubic-bezier(0.21, 0.89, 0.48, 1.2);
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.3), transparent 55%),
+    radial-gradient(circle at 100% 0, rgba(45, 212, 191, 0.25), transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(52, 211, 153, 0.2), transparent 55%);
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+}
+
+.cardInner {
+  position: relative;
+  z-index: 1;
+}
+
+.fieldLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.requiredDot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #38bdf8, #22c55e);
+}
+
+.errorMessage {
+  padding-top: 0.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+.errorPulse {
+  animation: errorPulse 320ms ease-out;
+}
+
+@keyframes modalEnter {
+  0% {
+    transform: translateY(10px) scale(0.96);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes errorPulse {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+
