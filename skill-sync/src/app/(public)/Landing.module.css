@@ -1,6 +1,5 @@
 /* General Layout */
 .pageWrapper {
-  background-color: var(--color-background);
   color: var(--color-foreground);
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden; /* Prevent horizontal scroll from decorative elements */
@@ -124,7 +123,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   background: -webkit-linear-gradient(45deg, #38bdf8, #8b5cf6);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1rem;
 }
@@ -170,7 +169,6 @@
 /* --- Features Section --- */
 .features {
   padding: 6rem 0;
-  background-color: var(--color-secondary);
 }
 
 .sectionHeader {
@@ -211,22 +209,11 @@
 }
 
 .featureCard {
-  background-color: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 1rem;
   padding: 2rem;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-.featureCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-}
-.dark .featureCard:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
 
 .featureIcon {
   display: flex;
@@ -280,4 +267,42 @@
 .footerCopyright {
   font-size: 0.9rem;
   color: var(--color-muted-foreground);
+}
+/*edited by mahmoud and google AI*/
+/* 1. Make the main wrapper transparent */
+.pageWrapper {
+  background-color: transparent; /* WAS: var(--color-background) */
+  color: var(--color-foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* 2. REMOVE the static gradients from the Hero background */
+.heroBackground {
+  display: none; /* We want the animated orbs to be the background */
+}
+
+/* 3. Make the Features section transparent */
+.features {
+  padding: 6rem 0;
+  background-color: transparent; /* WAS: var(--color-secondary) */
+}
+
+/* 4. Add Glassmorphism to Cards so they "pick up" the orb colors */
+.featureCard {
+  background-color: rgba(var(--color-card-rgb, 255, 255, 255), 0.05); /* Very transparent */
+  backdrop-filter: blur(12px); /* This makes the orbs look amazing behind the cards */
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* 5. Update Navbar transparency */
+.navbarScrolled {
+  background-color: rgba(var(--background-rgb, 10, 10, 10), 0.4);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }

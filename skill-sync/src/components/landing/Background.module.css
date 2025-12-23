@@ -1,0 +1,45 @@
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* Keep it behind everything */
+  filter: blur(120px);
+  pointer-events: none; /* Allows clicking items through the background */
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  width: 45vw;
+  height: 45vw;
+  border-radius: 50%;
+  opacity: 0.25;
+  will-change: transform; /* Performance optimization */
+}
+
+.pOrb {
+  background: #a855f7; /* Your purple */
+  top: -10%;
+  left: -10%;
+}
+
+.bOrb {
+  background: #93c5fd; /* Your ice/blue */
+  bottom: -10%;
+  right: -10%;
+}
+
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#smooth-content {
+  overflow: visible;
+  width: 100%;
+}
