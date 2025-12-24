@@ -20,12 +20,14 @@
   background: #a855f7; /* Your purple */
   top: -10%;
   left: -10%;
+  animation: scale 3s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
 }
 
 .bOrb {
   background: #93c5fd; /* Your ice/blue */
   bottom: -10%;
   right: -10%;
+  animation: scale 3s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
 }
 
 #smooth-wrapper {
@@ -42,4 +44,11 @@
 #smooth-content {
   overflow: visible;
   width: 100%;
+}
+
+@keyframes scale {
+  0%{
+    transform: scale(0.3);
+    opacity: 0;
+  }
 }

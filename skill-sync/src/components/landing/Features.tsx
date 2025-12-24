@@ -2,122 +2,76 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import { ScrollSmoother } from "gsap/dist/ScrollSmoother";
 import { useGSAP } from "@gsap/react";
 import styles from "@/app/(public)/Landing.module.css";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP);
+  gsap.registerPlugin(ScrollTrigger);
 }
 
 export default function Features() {
   const container = useRef<HTMLDivElement>(null);
-
+  
   const steps = [
-    {
-      number: "1",
-      title: "Post a Proposal",
-      desc: "Share a skill you can teach and learn.",
-    },
-    {
-      number: "2",
-      title: "Find Your Match",
-      desc: "Browse proposals or get matched.",
-    },
-    {
-      number: "3",
-      title: "Swap & Learn",
-      desc: "Connect and start knowledge exchange.",
-    },
-    {
-      number: "4",
-      title: "Get Endorsed",
-      desc: "Complete swaps and earn badges.",
-    },
+    { number: "1", title: "Post a Proposal", desc: "Share a skill you can teach and learn." },
+    { number: "2", title: "Find Your Match", desc: "Browse proposals or get matched." },
+    { number: "3", title: "Swap & Learn", desc: "Connect and start knowledge exchange." },
+    { number: "4", title: "Get Endorsed", desc: "Complete swaps and earn badges." },
   ];
 
-  useGSAP(
-    () => {
-      // 1. INITIALIZE SMOOTH SCROLL
-      const smoother = ScrollSmoother.create({
-        wrapper: "#smooth-wrapper",
-        content: "#smooth-content",
-        smooth: 1.5,
-        effects: true,
-        smoothTouch: 0.1,
-      });
+  useGSAP(() => {
+    const cards = gsap.utils.toArray<HTMLElement>(".feature-card");
+    if (!cards.length) return;
 
-      // 2. TEXT CRYSTALLIZATION (Blur Reveal)
-      const blurTargets = [
-        `.${styles.sectionTitle}`,
-        `.` + styles.sectionDescription,
-      ];
-      blurTargets.forEach((target) => {
-        gsap.fromTo(
-          target,
-          { filter: "blur(15px)", opacity: 0, y: 30 },
-          {
-            scrollTrigger: {
-              trigger: target,
-              start: "top 90%",
-              end: "top 65%",
-              scrub: true,
-            },
-            filter: "blur(0px)",
-            opacity: 1,
-            y: 0,
-          }
-        );
-      });
+    // 1. IMMERSIVE ENTRANCE: Cards start hidden and pop in
+    // This creates the "reveal" before the parallax begins
+    gsap.set(cards, { opacity: 0, scale: 0.9, y: 50 });
 
-      // 3. BENTO CARD REVEAL (Initial Entrance)
-      gsap.set(".feature-card", { opacity: 0, scale: 1, y: 40 });
-      gsap.to(".feature-card", {
+    gsap.to(cards, {
+      scrollTrigger: {
+        trigger: `.${styles.featuresGrid}`,
+        start: "top 85%", // Triggers slightly before the grid enters center
+        toggleActions: "play none none reverse",
+      },
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      stagger: 0.1,
+      duration: 0.2,
+      ease: "linear",
+    });
+
+    // 2. PARALLEL PARALLAX: Cards move at different speeds while scrolling
+    // We use a separate ScrollTrigger for constant parallel movement
+    cards.forEach((card, i) => {
+      gsap.to(card, {
         scrollTrigger: {
-          trigger: `.${styles.featuresGrid}`,
-          start: "top 60%",
+          trigger: card,
+          start: "top bottom", // Starts as soon as card bottom enters screen
+          end: "bottom top",    // Ends when card top leaves screen
+          scrub: true,          // Links movement strictly to scroll progress
         },
+        // The further down the card is in the list, the faster it moves (Parallel effect)
+        y: -100 * (i + 1) * 0.2, 
+        ease: "linear",
+      });
+    });
+
+    // 3. TEXT CRYSTALLIZATION (Your established blur effect)
+    gsap.fromTo([`.${styles.sectionTitle}`, `.${styles.sectionDescription}`],
+      { filter: "blur(15px)", opacity: 0 },
+      {
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top 80%",
+          end: "top 70%",
+          scrub: true,
+        },
+        filter: "blur(0px)",
         opacity: 1,
-        scale: 1,
-        y: 0,
-        stagger: 0.15,
-        duration: 1,
-        ease: "power4.out",
-      });
-
-      // 4. WAVE ANIMATION (Dynamic Velocity Fix)
-      const cards = gsap.utils.toArray(".feature-card");
-
-      // Create 'quickTo' instances for each card for smooth, high-performance movement
-      const quickToSetters = cards.map((card: any) =>
-        gsap.quickTo(card, "y", { duration: 0.5, ease: "power2.out" })
-      );
-
-      ScrollTrigger.create({
-        onUpdate: (self) => {
-          // Get velocity and scale it (adjust 0.05 to change wave height)
-          const velocity = self.getVelocity() * -0.05;
-
-          quickToSetters.forEach((setY, i) => {
-            // Offset each card by its index to create the 'wave'
-            setY(velocity * (i + 1) * 0.1);
-          });
-        },
-        // Reset to 0 when the user stops scrolling (for browsers that support it)
-        onToggle: (self) => {
-          if (!self.isActive) {
-            quickToSetters.forEach((setY) => setY(0));
-          }
-        },
-      });
-
-      // Final safety reset for 2025 browsers
-      window.addEventListener("scrollend", () => {
-        quickToSetters.forEach((setY) => setY(0));
-      });
-    },
-    { scope: container }
-  );
+      }
+    );
+  }, { scope: container });
 
   return (
     <section id="features" ref={container} className={styles.features}>
@@ -125,7 +79,7 @@ export default function Features() {
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>How It Works</h2>
           <p className={styles.sectionDescription}>
-            Four simple steps to unlock a world of knowledge.
+            Unlock knowledge without spending a dime.
           </p>
         </div>
 
