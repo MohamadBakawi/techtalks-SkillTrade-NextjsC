@@ -6,15 +6,21 @@ import Link from "next/link";
 import { signOut } from "@/actions/auth";
 import { getNotifications, markNotificationAsRead } from "@/actions/notifications";
 import { deleteProposal } from "@/actions/proposal-actions";
-import { createSwapFromApplication } from "@/actions/swaps";
+import { createSwapFromApplication, updateSwapStatus } from "@/actions/swaps";
 import { updateApplicationStatus } from "@/actions/applications";
+import { createReview } from "@/actions/reviews";
 import styles from './Dashboard.module.css';
 
 // UI Components
 import { PostProposalModal } from "@/components/PostProposalModal";
-import { ChatModal } from "@/components/ChatModal"; // Chat functionality is imported here
+import { ChatModal } from "@/components/ChatModal";
 import { ProposalDetailsModal } from "@/components/ProposalDetailsModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +28,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggleButton } from "@/components/ThemeToggleButton";
 import {
-  Bell, LogOut, Zap, MapPin, Search, Layers, Trash2, CheckCircle, XCircle, UserCircle, Plus, Home
+  Bell, LogOut, Zap, MapPin, Search, Layers, Trash2, CheckCircle, XCircle, UserCircle, Plus, Home, MoreVertical, Star, AlertCircle
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import NavSearchButton from "../../../components/features/search/NavSearchButton";
@@ -46,10 +56,18 @@ export default function DashboardClientContent({
   const router = useRouter();
   const { toast } = useToast();
 
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewingSwap, setReviewingSwap] = useState<any | null>(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [reviewError, setReviewError] = useState("");
+
   useEffect(() => {
     const fetchNotifs = async () => {
       try {
-        const data = await getNotifications();
+        const rawData = await getNotifications();
+        // FIX: Cast the unknown data from the raw query to an array type.
+        const data = rawData as any[]; 
         setNotifications(data);
         setUnreadCount(data.filter((n: any) => !n.isRead).length);
       } catch (e) { console.error(e); }
@@ -89,6 +107,47 @@ export default function DashboardClientContent({
       await updateApplicationStatus({ applicationId: appId, status: "REJECTED" });
       router.refresh();
     } catch (e) { toast({ variant: "destructive", title: "Error rejecting." }); }
+  };
+
+  const handleUpdateSwapStatus = async (swapId: string, status: "COMPLETED" | "CLOSED") => {
+    if (status === "CLOSED" && !confirm("Are you sure you want to cancel this swap? This action cannot be undone.")) return;
+    try {
+        await updateSwapStatus({ swapId, status });
+        toast({ title: "Swap Updated", description: `The swap has been marked as ${status.toLowerCase()}.` });
+        router.refresh();
+    } catch (error) {
+        toast({ variant: "destructive", title: "Error", description: "Failed to update swap status." });
+    }
+  }
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0) {
+        setReviewError("Please select a rating.");
+        return;
+    }
+    if (!reviewingSwap) return;
+    
+    try {
+        await createReview({ swapId: reviewingSwap.id, rating, comment });
+        toast({ title: "Review Submitted!", description: "Thank you for your feedback." });
+        setReviewingSwap(null);
+        setReviewModalOpen(false);
+        setRating(0);
+        setComment("");
+        setReviewError("");
+        router.refresh();
+    } catch (error: any) {
+        setReviewError(error.message || "Failed to submit review.");
+    }
+  }
+
+  const handleOpenReviewModal = (swap: any) => {
+    setReviewingSwap(swap);
+    setReviewModalOpen(true);
+    setRating(0);
+    setComment("");
+    setReviewError("");
   };
 
   const NavLink = ({ id, label, icon: Icon }: any) => (
@@ -140,41 +199,126 @@ export default function DashboardClientContent({
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {activeTab === "browse" && <BrowseTabContent publicOnlyProposals={publicOnlyProposals} />}
           {activeTab === "my-proposals" && <MyProposalsTabContent myProposals={myProposals} handleDelete={handleDeleteProposal} />}
-          {activeTab === "active-swaps" && <ActiveSwapsTabContent applications={applications} swaps={swaps} user={overview.user} handleAccept={handleAccept} handleReject={handleReject} />}
+          {activeTab === "active-swaps" && <ActiveSwapsTabContent applications={applications} swaps={swaps} user={overview.user} handleAccept={handleAccept} handleReject={handleReject} handleComplete={handleUpdateSwapStatus} handleCancel={handleUpdateSwapStatus} handleReview={handleOpenReviewModal}/>}
         </div>
       </main>
+
+      <Dialog open={isReviewModalOpen} onOpenChange={setReviewModalOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Leave a Review for {reviewingSwap?.proposal?.title}</DialogTitle>
+                <DialogDescription>
+                    How was your experience with {reviewingSwap?.teacherId === overview.user?.id ? reviewingSwap?.student.name : reviewingSwap?.teacher.name}? Your review is required to close the swap.
+                </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleReviewSubmit}>
+                <div className="py-4 space-y-4">
+                    <div>
+                        <Label>Rating</Label>
+                        <div className="flex items-center gap-1 mt-2">
+                            {[1, 2, 3, 4, 5].map(star => (
+                                <Star
+                                    key={star}
+                                    className={`cursor-pointer h-8 w-8 transition-colors ${rating >= star ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground'}`}
+                                    onClick={() => setRating(star)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <Label htmlFor="comment">Comment (Optional)</Label>
+                        <Textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} placeholder="Share your experience..." className="mt-2" />
+                    </div>
+                    {reviewError && (
+                        <p className="text-sm text-destructive flex items-center gap-2"><AlertCircle className="h-4 w-4" />{reviewError}</p>
+                    )}
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setReviewModalOpen(false)}>Cancel</Button>
+                    <Button type="submit">Submit Review</Button>
+                </DialogFooter>
+            </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 // --- Sub-Components ---
 
-const SwapCard = ({ swap, partner, currentUserId }: any) => (
-  <div className={styles.swapCard}>
-    <div className={styles.partnerInfo}>
-      <Avatar className="h-12 w-12 border-2 border-border">
-        <AvatarImage src={partner.avatarUrl} />
-        <AvatarFallback>{partner.name[0]}</AvatarFallback>
-      </Avatar>
-      <div>
-        <h4 className="font-bold text-foreground">{partner.name}</h4>
-        <p className="text-sm text-primary">{swap.proposal.title}</p>
-      </div>
-    </div>
-    <div className="mt-4 pt-4 border-t border-border flex justify-end">
-      {/* ================================================================== */}
-      {/* CHAT FUNCTIONALITY INTEGRATION POINT                               */}
-      {/* ================================================================== */}
-      <ChatModal
-        swapId={swap.id}
-        currentUserId={currentUserId}
-        otherUserName={partner.name}
-      />
-    </div>
-  </div>
-);
+const SwapCard = ({ swap, partner, currentUserId, onComplete, onCancel, onReview, hasReviewed }: any) => {
+    const prematureClosureReasons = [
+        "Mutual agreement", "Partner unresponsive", "Skill mismatch", "Other"
+    ];
 
-const ActiveSwapsTabContent = ({ applications, swaps, user, handleAccept, handleReject }: any) => {
+    return (
+        <div className={styles.swapCard}>
+            <div className={styles.partnerInfo}>
+                <Avatar className="h-12 w-12 border-2 border-border">
+                    <AvatarImage src={partner.avatarUrl} />
+                    <AvatarFallback>{partner.name[0]}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <h4 className="font-bold text-foreground">{partner.name}</h4>
+                    <p className="text-sm text-primary">{swap.proposal.title}</p>
+                </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
+                <ChatModal
+                    swapId={swap.id}
+                    currentUserId={currentUserId}
+                    otherUserName={partner.name}
+                />
+                <div className="flex items-center gap-2">
+                    {swap.status === 'ACTIVE' && (
+                        <>
+                            <Button size="sm" onClick={() => onComplete(swap.id, 'COMPLETED')}>Complete</Button>
+                        </>
+                    )}
+                    {swap.status === 'COMPLETED' && !hasReviewed && (
+                        <Button size="sm" variant="outline" onClick={() => onReview(swap)}>Leave Review</Button>
+                    )}
+                    {swap.status === 'COMPLETED' && hasReviewed && (
+                        <Badge variant="secondary"><CheckCircle className="w-4 h-4 mr-2" />Reviewed</Badge>
+                    )}
+                    {swap.status === 'CLOSED' && (
+                        <Badge variant="destructive">Cancelled</Badge>
+                    )}
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {swap.status === 'ACTIVE' && (
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Cancel Swap</DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuLabel>Reason for cancellation</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            {prematureClosureReasons.map(reason => (
+                                                 <DropdownMenuItem key={reason} onClick={() => onCancel(swap.id, 'CLOSED')}>
+                                                     {reason}
+                                                 </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <a className="text-destructive focus:text-destructive" href={`mailto:support@skillswap.com?subject=Report%20Swap:%20${swap.proposal.title}&body=Swap%20ID:%20${swap.id}%0A%0AReason%20for%20reporting:`}>Report Swap</a>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ActiveSwapsTabContent = ({ applications, swaps, user, handleAccept, handleReject, handleComplete, handleCancel, handleReview }: any) => {
   const pendingApps = applications.filter((a: any) => a.status === "PENDING");
   return (
     <div className="space-y-12">
@@ -198,7 +342,8 @@ const ActiveSwapsTabContent = ({ applications, swaps, user, handleAccept, handle
           <div className="grid gap-6 md:grid-cols-2">
             {swaps.map((swap: any) => {
               const partner = swap.teacherId === user.id ? swap.student : swap.teacher;
-              return <SwapCard key={swap.id} swap={swap} partner={partner} currentUserId={user.id} />;
+              const hasReviewed = swap.reviews?.some((r: any) => r.authorId === user.id);
+              return <SwapCard key={swap.id} swap={swap} partner={partner} currentUserId={user.id} onComplete={handleComplete} onCancel={handleCancel} onReview={handleReview} hasReviewed={hasReviewed} />;
             })}
           </div>
         )}
@@ -238,6 +383,7 @@ const ProposalCard = ({ proposal, isOwner = false, onDelete }: any) => {
 
     return (
         <div className={styles.card}>
+            {proposal.imageUrl && <img src={proposal.imageUrl} alt={proposal.title} className="w-full h-32 object-cover rounded-t-lg" />}
             <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>{proposal.title}</h3>
                 <div className={styles.cardBadge}>{modalityIcon} {proposal.modality}</div>

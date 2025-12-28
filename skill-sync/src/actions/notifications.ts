@@ -7,11 +7,14 @@ export async function getNotifications() {
     const userId = await getCurrentUserId();
     if (!userId) return []; // Return empty array if not auth
 
-    return prisma.notification.findMany({ 
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-    });
+    // FIX: Use a raw query to explicitly filter out notifications where the 'type' is null.
+    // This prevents a crash if there is corrupted data in the database.
+    const notifications = await prisma.$queryRawUnsafe(
+        'SELECT * FROM "Notification" WHERE "userId" = $1 AND "type" IS NOT NULL ORDER BY "createdAt" DESC LIMIT 20',
+        userId
+    );
+
+    return notifications;
 }
 
 export async function markNotificationAsRead(notificationId: string) {

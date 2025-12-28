@@ -1,4 +1,3 @@
-
 'use server';
 
 import { z } from 'zod';
@@ -13,6 +12,7 @@ const CreateProposalSchema = z.object({
   modality: z.enum(["Remote", "In-Person"] as const),
   offeredSkillName: z.string().min(1, "You must offer one skill."),
   neededSkillNames: z.string().min(1, "You must seek at least one skill."),
+  imageUrl: z.string().url("Please enter a valid image URL.").optional().or(z.literal('')),
 });
 
 type ProposalFormData = z.infer<typeof CreateProposalSchema>;
@@ -22,9 +22,13 @@ export async function createProposal(
   formData: ProposalFormData,
   options: { revalidate: boolean } = { revalidate: true }
 ) {
+  // --- SERVER DEBUG LOG 1 ---
+  console.log("Server action 'createProposal' received data:", formData);
+
   const userId = await getCurrentUserId();
 
   if (!userId) {
+    console.log("User not authenticated. Aborting.");
     return {
       success: false,
       message: 'You must be logged in to post a proposal.',
@@ -35,6 +39,8 @@ export async function createProposal(
   const validatedFields = CreateProposalSchema.safeParse(formData);
 
   if (!validatedFields.success) {
+    // --- SERVER DEBUG LOG 2 ---
+    console.log("Zod validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       success: false,
       errors: validatedFields.error.flatten().fieldErrors,
@@ -42,9 +48,10 @@ export async function createProposal(
     };
   }
 
-  const { title, description, modality, offeredSkillName, neededSkillNames } = validatedFields.data;
+  const { title, description, modality, offeredSkillName, neededSkillNames, imageUrl } = validatedFields.data;
 
   try {
+    console.log("Validation passed. Attempting to create proposal in DB...");
     // 2. Get or Create Offered Skill
     const offeredSkill = await prisma.skill.upsert({
       where: { name: offeredSkillName },
@@ -75,6 +82,7 @@ export async function createProposal(
         description,
         modality: dbModality,
         status: 'OPEN',
+        imageUrl: imageUrl || null,
         offeredSkills: {
           connect: [{ id: offeredSkill.id }],
         },
@@ -83,6 +91,8 @@ export async function createProposal(
         },
       },
     });
+
+    console.log("Proposal created successfully with ID:", proposal.id);
 
     if (options.revalidate) {
       revalidatePath('/dashboard');
@@ -95,10 +105,11 @@ export async function createProposal(
     };
 
   } catch (error) {
-    console.error('Action Error:', error);
+    // --- SERVER DEBUG LOG 3 ---
+    console.error('Server action error:', error);
     return {
       success: false,
-      message: 'Failed to create proposal due to an unexpected error.',
+      message: 'Failed to create proposal due to an unexpected server error.',
     };
   }
 }
@@ -114,13 +125,14 @@ export async function createProposalAction(
     modality: formData.get("modality") as "Remote" | "In-Person",
     offeredSkillName: formData.get("offeredSkillName") as string,
     neededSkillNames: formData.get("neededSkillNames") as string,
+    imageUrl: formData.get("imageUrl") as string,
   };
 
   const result = await createProposal(rawData);
   return result;
 }
 
-// --- Server Action: Delete a Proposal ---
+// --- Server Action: Delete a Proposal (RESTORED) ---
 export async function deleteProposal(proposalId: string) {
   const userId = await getCurrentUserId();
   if (!userId) return { success: false, message: 'Not authenticated' };

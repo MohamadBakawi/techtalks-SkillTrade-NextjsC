@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/actions/auth";
-import { SwapStatus } from "@prisma/client";
+import { SwapStatus } from "@prisma/client"; // This type is updated by `prisma generate`
 
 export async function createSwapFromApplication(applicationId: string) {
   const userId = await getCurrentUserId();
@@ -68,7 +68,7 @@ export async function listMySwaps() {
 
 export async function updateSwapStatus(params: {
   swapId: string;
-  status: SwapStatus;
+  status: SwapStatus; // The type error resolves here
 }) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Not authenticated");

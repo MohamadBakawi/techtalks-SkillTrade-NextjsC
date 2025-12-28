@@ -17,6 +17,7 @@ import { createApplication } from "@/actions/applications";
 import { deleteProposal } from "@/actions/proposal-actions";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Trash2, Send, Zap, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function ProposalDetailsModal({ 
     proposal, 
@@ -77,58 +78,74 @@ export function ProposalDetailsModal({
             <DialogTrigger asChild>
                 <Button variant="outline" className="flex-1">Details</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{proposal.title}</DialogTitle>
-                    <DialogDescription className="flex items-center gap-2">
-                        {modalityIcon} {String(proposal.modality).replace("_", " ")}
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="max-w-md p-0">
+                {proposal.imageUrl && (
+                    <img src={proposal.imageUrl} alt={proposal.title} className="w-full h-40 object-cover rounded-t-lg" />
+                )}
+                <div className="p-6">
+                    <DialogHeader>
+                        <DialogTitle>{proposal.title}</DialogTitle>
+                        <DialogDescription className="flex items-center gap-2">
+                            {modalityIcon} {String(proposal.modality).replace("_", " ")}
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <div className="py-4 space-y-4">
-                    <p className="text-sm text-muted-foreground">{proposal.description}</p>
-                    
-                    <div className="flex justify-between text-sm">
-                        <div>
-                            <span className="font-semibold block text-green-600">Offering:</span>
-                            <Badge variant="secondary">{offeredSkill}</Badge>
-                        </div>
-                        <div className="text-right">
-                            <span className="font-semibold block text-orange-600">Seeking:</span>
-                            <div className="flex flex-wrap gap-1 justify-end">
-                                {neededSkills.map((s: any) => (
-                                    <Badge key={s.id} variant="outline">{s.skill?.name || s.name}</Badge>
-                                ))}
+                    <div className="py-4 space-y-4">
+                        <p className="text-sm text-muted-foreground">{proposal.description}</p>
+                        
+                        <div className="flex justify-between text-sm">
+                            <div>
+                                <span className="font-semibold block text-green-600">Offering:</span>
+                                <Badge variant="secondary">{offeredSkill}</Badge>
+                            </div>
+                            <div className="text-right">
+                                <span className="font-semibold block text-orange-600">Seeking:</span>
+                                <div className="flex flex-wrap gap-1 justify-end">
+                                    {neededSkills.map((s: any) => (
+                                        <Badge key={s.id} variant="outline">{s.skill?.name || s.name}</Badge>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <DialogFooter>
-                    {isOwner ? (
-                        <Button variant="destructive" onClick={handleDelete} disabled={loading}>
-                            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Delete
-                        </Button>
-                    ) : (
-                        !isApplying ? (
-                            <Button onClick={() => setIsApplying(true)}>Request Swap</Button>
-                        ) : (
-                            <div className="w-full space-y-2">
-                                <Textarea 
-                                    placeholder="Why are you a good match?" 
-                                    value={pitch} 
-                                    onChange={e => setPitch(e.target.value)} 
-                                />
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" onClick={() => setIsApplying(false)}>Cancel</Button>
-                                    <Button onClick={handleApply} disabled={loading}>
-                                        {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Send
-                                    </Button>
-                                </div>
-                            </div>
-                        )
-                    )}
-                </DialogFooter>
+                    <DialogFooter className="!justify-between items-center">
+                        <div>
+                             {!isOwner && (
+                                <Button variant="ghost" size="sm" asChild>
+                                    <a href={`mailto:support@skillswap.com?subject=Report%20Proposal:%20${proposal.title}&body=Proposal%20ID:%20${proposal.id}%0A%0AReason%20for%20reporting:`}>
+                                        Report
+                                    </a>
+                                </Button>
+                             )}
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            {isOwner ? (
+                                <Button variant="destructive" onClick={handleDelete} disabled={loading}>
+                                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Delete
+                                </Button>
+                            ) : (
+                                !isApplying ? (
+                                    <Button onClick={() => setIsApplying(true)}>Request Swap</Button>
+                                ) : (
+                                    <div className="w-full space-y-2">
+                                        <Textarea 
+                                            placeholder="Why are you a good match?" 
+                                            value={pitch} 
+                                            onChange={e => setPitch(e.target.value)} 
+                                        />
+                                        <div className="flex gap-2">
+                                            <Button variant="ghost" onClick={() => setIsApplying(false)}>Cancel</Button>
+                                            <Button onClick={handleApply} disabled={loading}>
+                                                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Send
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                    </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     );
