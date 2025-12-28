@@ -1,45 +1,104 @@
-
+"use client";
+import { useRef } from "react";
 import Link from "next/link";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/ui/button";
+import styles from "@/app/(public)/Landing.module.css";
 
 export default function Hero() {
+  const container = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null); // To track the H1 for cleanup
+
+  useGSAP(() => {
+    // Save original HTML to restore it on cleanup (prevents "animating the code" bug)
+    const originalHTML = titleRef.current?.innerHTML;
+
+    const splitTextWithLines = (selector: string): void => {
+      const title = container.current?.querySelector(selector) as HTMLElement | null;
+      if (!title || !originalHTML) return;
+
+      // Use the clean originalHTML to ensure we never split <span> tags
+      const lines: string[] = originalHTML.split("<br>");
+      let newHTML: string = "";
+
+      lines.forEach((line: string, index: number) => {
+        const chars: string = line.trim().split("").map((c: string) => 
+          `<span class="char" style="display:inline-block; will-change:transform, filter;">${c === " " ? "&nbsp;" : c}</span>`
+        ).join("");
+        newHTML += chars + (index < lines.length - 1 ? "<br>" : "");
+      });
+
+      title.innerHTML = newHTML;
+    };
+
+    splitTextWithLines(`.${styles.heroTitle}`);
+
+    const chars = gsap.utils.toArray(".char");
+    const introTl = gsap.timeline();
+
+    // autoAlpha: 1 handles visibility:hidden (from CSS) and opacity
+    introTl.set([`.${styles.heroTitle}`, `.${styles.heroEyebrow}`, `.${styles.heroDescription}`, `.${styles.heroActions}`], { 
+      autoAlpha: 1 
+    });
+
+    introTl
+      .to(`.${styles.heroBackground}`, { 
+          opacity: 1,
+          duration: 0.1 
+      })
+      .from(`.${styles.heroBackground}`, { 
+          scale: 1.2, 
+          duration: 2, 
+          ease: "expo.out" 
+      }, "<")
+      .from(chars, { 
+          opacity: 0, 
+          y: 50, 
+          filter: "blur(15px)", 
+          rotateX: -90, 
+          stagger: 0.02, 
+          duration: 1, 
+          ease: "back.out(1.7)",
+          clearProps: "filter,transform" // Keeps text sharp after animation
+      }, "-=1.5");
+
+    // CLEANUP: Reset the HTML when navigating away/returning
+    return () => {
+      if (titleRef.current && originalHTML) {
+        titleRef.current.innerHTML = originalHTML;
+      }
+    };
+  }, { scope: container });
+
   return (
-    <section className="relative min-h-[90vh] flex items-center px-8 md:px-16 gap-8 bg-gradient-to-b from-[#07101a] to-[#071a2a] text-white overflow-hidden">
-      {/* Content */}
-      <div className="flex-1 z-10 max-w-2xl mt-16 md:mt-0">
-        <small className="opacity-85 tracking-widest text-xs font-bold text-indigo-400 mb-2 block">THE BARTER ECONOMY</small>
-        <h1 className="text-6xl md:text-8xl font-black leading-none mb-6 tracking-tight">
-          SKILL<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">SWAP</span>
+    <section ref={container} className={styles.hero}>
+      <div className={styles.heroBackground} aria-hidden="true" />
+      
+      <div className={`${styles.container} ${styles.heroContent}`}>
+        <span className={`${styles.heroEyebrow} anim-load`}>
+          The future of learning is collaborative
+        </span>
+        
+        {/* Added titleRef here */}
+        <h1 ref={titleRef} className={styles.heroTitle}>
+          Trade Your Talent.<br />Master a New Skill.
         </h1>
-        <p className="text-lg text-slate-300 max-w-lg mb-8 leading-relaxed">
-          Learn by Teaching. SkillSwap is a peer-to-peer marketplace where your
-          expertise is the only currency. Exchange your knowledge for the skills
-          you crave.
+        
+        <p className={`${styles.heroDescription} anim-load`}>
+          SkillSwap is a peer-to-peer marketplace where your expertise is the only currency. 
+          Exchange your knowledge for the skills you've always wanted to learn, one-on-one.
         </p>
 
-        <div className="flex flex-wrap gap-4">
+        <div className={`${styles.heroActions} anim-load`}>
           <Link href="/dashboard">
-            <button className="px-8 py-3 rounded-full bg-gradient-to-r from-[#6a5cff] to-[#ff7bd6] text-white font-bold hover:scale-105 transition-transform shadow-lg shadow-purple-500/25">
-              BROWSE SWAPS
-            </button>
+            <Button size="lg">Start Browsing Swaps</Button>
           </Link>
           <Link href="/login">
-            <button className="px-8 py-3 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-bold hover:bg-white/10 transition-colors">
-              FIND MY MATCH
-            </button>
+            <Button size="lg" variant="secondary">
+              Find Your Match
+            </Button>
           </Link>
-        </div>
-      </div>
-
-      {/* Image */}
-      <div className="flex-1 flex justify-end items-center z-0 hidden md:flex">
-        <div className="relative w-[500px] h-[500px]">
-          <div className="absolute inset-0 bg-indigo-500/20 blur-[100px] rounded-full" />
-          {/* Ensure you have an image at /public/skill-logo.png or change the src */}
-          <img
-            src="/skill-logo.png"
-            alt="SkillSwap Illustration"
-            className="relative z-10 w-full h-full object-contain drop-shadow-2xl mix-blend-screen"
-          />
         </div>
       </div>
     </section>

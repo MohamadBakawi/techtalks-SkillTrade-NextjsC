@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/actions/auth";
-import { SwapStatus } from "@prisma/client";
+import { SwapStatus } from "@prisma/client"; // This type is updated by `prisma generate`
 
 export async function createSwapFromApplication(applicationId: string) {
   const userId = await getCurrentUserId();
@@ -68,7 +68,7 @@ export async function listMySwaps() {
 
 export async function updateSwapStatus(params: {
   swapId: string;
-  status: SwapStatus;
+  status: SwapStatus; // The type error resolves here
 }) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Not authenticated");
@@ -91,4 +91,24 @@ export async function updateSwapStatus(params: {
   });
 }
 
+// --- NEW FUNCTION ADDED ---
+export async function findActiveSwapBetweenUsers(otherUserId: string) {
+  const currentUserId = await getCurrentUserId();
+  if (!currentUserId) return null; // Not logged in
 
+  const swap = await prisma.swap.findFirst({
+    where: {
+      status: "ACTIVE",
+      // Find a swap where the two users are either (teacher, student) or (student, teacher)
+      OR: [
+        { teacherId: currentUserId, studentId: otherUserId },
+        { teacherId: otherUserId, studentId: currentUserId },
+      ],
+    },
+    select: {
+      id: true, // We only need the ID for the chat modal
+    },
+  });
+
+  return swap;
+}

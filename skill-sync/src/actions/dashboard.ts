@@ -91,6 +91,7 @@ export async function getDashboardOverview() {
         },
         teacher: true,
         student: true,
+        reviews: true, // <-- FIX: Include the reviews for each swap
       },
       orderBy: { startedAt: "desc" },
       take: 10,
