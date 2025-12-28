@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import styles from "@/app/(public)/Landing.module.css";
 
+// Register GSAP plugin safely for Next.js
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -21,56 +22,49 @@ export default function Features() {
 
   useGSAP(() => {
     const cards = gsap.utils.toArray<HTMLElement>(".feature-card");
-    if (!cards.length) return;
 
-    // 1. IMMERSIVE ENTRANCE: Cards start hidden and pop in
-    // This creates the "reveal" before the parallax begins
-    gsap.set(cards, { opacity: 0, scale: 0.9, y: 50 });
-
-    gsap.to(cards, {
-      scrollTrigger: {
-        trigger: `.${styles.featuresGrid}`,
-        start: "top 85%", // Triggers slightly before the grid enters center
-        toggleActions: "play none none reverse",
-      },
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      stagger: 0.1,
-      duration: 0.2,
-      ease: "linear",
-    });
-
-    // 2. PARALLEL PARALLAX: Cards move at different speeds while scrolling
-    // We use a separate ScrollTrigger for constant parallel movement
-    cards.forEach((card, i) => {
-      gsap.to(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top bottom", // Starts as soon as card bottom enters screen
-          end: "bottom top",    // Ends when card top leaves screen
-          scrub: true,          // Links movement strictly to scroll progress
-        },
-        // The further down the card is in the list, the faster it moves (Parallel effect)
-        y: -100 * (i + 1) * 0.2, 
-        ease: "linear",
-      });
-    });
-
-    // 3. TEXT CRYSTALLIZATION (Your established blur effect)
+    // 1. TEXT CRYSTALLIZATION (Reveals first)
     gsap.fromTo([`.${styles.sectionTitle}`, `.${styles.sectionDescription}`],
-      { filter: "blur(15px)", opacity: 0 },
+      { filter: "blur(15px)", opacity: 0, y: 30 },
       {
-        scrollTrigger: {
-          trigger: container.current,
-          start: "top 80%",
-          end: "top 70%",
-          scrub: true,
-        },
         filter: "blur(0px)",
         opacity: 1,
+        y: 0,
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top 90%",
+          end: "top 70%",
+          scrub: 1,
+        },
       }
     );
+
+    // 2. THE PHYSICAL WAVE REVEAL
+    cards.forEach((card, i) => {
+      gsap.fromTo(card, 
+        { 
+          y: 120,          // Start below original position
+          rotateZ: 6,      // Tilted for the "wave" look
+          opacity: 0,
+          scale: 0.85      // Slightly smaller
+        }, 
+        {
+          y: 0,            // Return to "first place"
+          rotateZ: 0,      // Straighten out
+          opacity: 1,
+          scale: 1,        // Normal size
+          ease: "back.out(1.4)", // Physical bounce settling effect
+          scrollTrigger: {
+            trigger: card,
+            // STAGGERED START: i * 80 creates a 80px scroll delay between cards
+            start: () => `top+=${i * 80} 95%`, 
+            end: () => `top+=${i * 80} 65%`,
+            scrub: 1.8,    // High inertia makes them glide into place
+            toggleActions: "play none none reverse",
+          }
+        }
+      );
+    });
   }, { scope: container });
 
   return (
@@ -88,6 +82,7 @@ export default function Features() {
             <div
               key={step.number}
               className={`feature-card ${styles.featureCard}`}
+              style={{ willChange: "transform, opacity" }}
             >
               <div className={styles.featureIcon}>{step.number}</div>
               <h3 className={styles.featureTitle}>{step.title}</h3>
