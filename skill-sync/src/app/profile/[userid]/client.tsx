@@ -23,10 +23,27 @@ import { findActiveSwapBetweenUsers } from "@/actions/swaps";
 import { ChatModal } from "@/components/ChatModal";
 
 // --- Type Definitions ---
+interface ReviewData {
+  id: string;
+  rating: number;
+  comment: string | null;
+  author: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+  };
+  swap: {
+    proposal: {
+      title: string;
+    };
+  };
+}
+
 interface ProfileData {
   id: string; name: string; industry: string; bio: string; avatarUrl: string | null; phoneNumber: string | null;
   skills: Array<{ id: string; name: string; source: string; isVisible: boolean; }>;
   reputation: { averageRating: number; completedSwaps: number; totalEndorsements: number; };
+  reviewsReceived: ReviewData[];
 }
 
 interface ProfileClientContentProps {
@@ -38,7 +55,7 @@ export default function ProfileClientContent({ profileData, isOwnProfile, useMoc
   const router = useRouter();
   const { toast } = useToast();
   const [editMode, setEditMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<'about' | 'skills'>('about');
+  const [activeTab, setActiveTab] = useState<'about' | 'skills' | 'reviews'>('about');
   
   const [formData, setFormData] = useState({
     name: profileData.name || "", industry: profileData.industry || "", bio: profileData.bio || "",
@@ -231,6 +248,7 @@ function ProfileMainContent({ profileData, formData, setFormData, editMode, acti
       <nav className={styles.tabNav}>
         <button onClick={() => setActiveTab('about')} className={cn(styles.tabButton, activeTab === 'about' && styles.active)}>About</button>
         <button onClick={() => setActiveTab('skills')} className={cn(styles.tabButton, activeTab === 'skills' && styles.active)}>Skills</button>
+        <button onClick={() => setActiveTab('reviews')} className={cn(styles.tabButton, activeTab === 'reviews' && styles.active)}>Reviews</button>
       </nav>
       
       {activeTab === 'about' && (
@@ -238,6 +256,9 @@ function ProfileMainContent({ profileData, formData, setFormData, editMode, acti
       )}
       {activeTab === 'skills' && (
         <SkillsTab skills={profileData.skills} editMode={editMode} />
+      )}
+      {activeTab === 'reviews' && (
+        <ReviewsTab reviews={profileData.reviewsReceived} />
       )}
     </div>
   );
@@ -299,6 +320,59 @@ function SkillsTab({ skills, editMode }: { skills: ProfileData['skills'], editMo
             </Button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className={styles.tabContent}>
+        <h2 className={styles.sectionTitle}>Reviews Received</h2>
+        <p className={styles.bioText}>This user has not received any reviews yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.tabContent}>
+      <h2 className={styles.sectionTitle}>Reviews Received ({reviews.length})</h2>
+      <div className="space-y-6">
+        {reviews.map((review) => (
+          <div key={review.id} className="flex items-start gap-4 p-4 border border-border rounded-lg bg-background">
+            <Avatar>
+              <AvatarImage src={review.author.avatarUrl || ''} />
+              <AvatarFallback>{review.author.name?.[0] || 'A'}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-foreground">{review.author.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    For swap: "{review.swap.proposal.title}"
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={16}
+                      className={cn(
+                        i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/50'
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+              {review.comment && (
+                <blockquote className="mt-3 text-sm text-muted-foreground italic bg-muted/50 p-3 rounded-md border-l-2 border-border">
+                  {review.comment}
+                </blockquote>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

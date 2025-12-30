@@ -29,7 +29,21 @@ export async function getUserProfile(userId: string) {
       skills: {
         include: { skill: true },
       },
-      reviewsReceived: true,
+      reviewsReceived: {
+        include: {
+          author: true,
+          swap: {
+            include: {
+              proposal: {
+                select: { title: true },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
       swapsAsTeacher: {
         where: { status: "COMPLETED" },
       },
@@ -63,6 +77,7 @@ export async function getUserProfile(userId: string) {
       source: s.source,
       isVisible: s.isVisible,
     })),
+    reviewsReceived: user.reviewsReceived,
     reputation: {
       averageRating,
       completedSwaps,
