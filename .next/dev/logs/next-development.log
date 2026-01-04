@@ -1,0 +1,53 @@
+[00:00:05.197] Server  LOG      ✓ Ready in 4.3s
+[00:00:11.976] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\.next\dev\server\chunks\node_modules_8de52803._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:11.981] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\.next\dev\server\chunks\[root-of-the-server]__117aaa33._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.016] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\.next\dev\server\chunks\node_modules_next_771f40a9._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.075] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.090] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.121] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.123] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.126] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\lib\router-utils\resolve-routes.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.129] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.134] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:12.139] Server  ERROR    ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+[00:00:15.060] Browser ERROR   uncaughtError: Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+[00:00:17.724] Server  LOG      ○ Compiling /_not-found/page ...
+[00:04:19.782] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.788] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.790] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:19.798] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.799] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.802] Server  ERROR    ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:19.804] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.807] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.808] Server  ERROR    ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:19.974] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.976] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.980] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:19.987] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:19.992] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.024] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:20.124] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.154] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.166] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:20.206] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.322] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.408] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:20.564] Server  LOG      ✓ Compiled in 1253ms
+[00:04:20.653] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:04:20.654] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/shared/lib/router/router.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:04:20.655] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:04:20.673] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.675] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.679] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'
+[00:04:20.689] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\lib\recursive-readdir.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.691] Server  ERROR   C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\node_modules\next\dist\server\route-matcher-providers\dev\helpers\file-reader\batched-file-reader.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:04:20.694] Server  ERROR   Error: ENOENT: no such file or directory, scandir 'C:\Users\Acer\Documents\Next\techtalks-SkillTrade-NextjsC\src\app'

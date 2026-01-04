@@ -1,0 +1,469 @@
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboardLayout::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -5%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, hsla(var(--primary), 0.08) 0%, transparent 70%);
+  filter: blur(100px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dashboardLayout::after {
+  content: "";
+  position: absolute;
+  bottom: -10%;
+  right: -5%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+  filter: blur(100px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.sidebar {
+  width: 280px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), background 1.2s ease;
+  will-change: transform;
+  z-index: 50;
+  box-shadow: 20px 0 80px -20px rgba(0, 0, 0, 0.3);
+}
+
+.mainContent {
+  flex: 1;
+  padding: 2.5rem 4rem;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  background-color: var(--color-background);
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Sidebar Styling */
+.logo {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--color-foreground);
+  margin-bottom: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-left: 0.5rem;
+}
+
+.logo span {
+  color: var(--color-primary);
+}
+
+.navGroupTitle {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-muted-foreground);
+  margin: 1.5rem 0 1rem 0.5rem;
+  opacity: 0.5;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+  transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+  margin-bottom: 0.5rem;
+  border: 1px solid transparent;
+}
+
+.navLink:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+  transform: translateX(12px) scale(1.02);
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.25);
+  transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Slower, viscous hover */
+}
+
+.active {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: 0 15px 35px -10px hsl(var(--primary) / 0.4);
+  transform: translateX(4px);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animateSlideUp,
+.animateSlideInRight {
+  will-change: transform, opacity;
+}
+
+.animateSlideUp {
+  animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animateSlideInRight {
+  animation: slideInRight 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.dark .navLink.active {
+  color: var(--color-primary-foreground);
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  padding-top: 2rem;
+}
+
+/* Header Styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Changed from flex-end for better sticky alignment */
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.headerTitle {
+  font-size: 3rem;
+  /* Slightly smaller for better sticky fit */
+  font-weight: 900;
+  color: var(--color-foreground);
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Card Styling */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 2.5rem;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 2rem;
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-premium);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: var(--color-primary);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6);
+  transition: all 2s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Viscous Master Standard */
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.dark .card:hover {
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--color-foreground);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+.cardBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cardBody {
+  flex-grow: 1;
+  margin-bottom: 2.5rem;
+}
+
+.skillRow {
+  margin-top: 1rem;
+}
+
+.skillLabel {
+  font-size: 0.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skillLabel.offered {
+  color: #34d399;
+}
+
+.skillLabel.needed {
+  color: #fb923c;
+}
+
+.skillName {
+  font-size: 0.95rem;
+  color: var(--color-muted-foreground);
+  font-weight: 500;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--color-border);
+}
+
+.cardFooter {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+/* Application & Swap Cards */
+.applicationCard,
+.swapCard {
+  transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform, box-shadow;
+}
+
+.applicationCard:hover,
+.swapCard:hover {
+  border-color: var(--color-primary);
+}
+
+.swapCard .partnerInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Empty State */
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 10rem 2rem;
+  border: 2px dashed var(--glass-border);
+  border-radius: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.emptyState p {
+  color: var(--color-foreground);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+/* --- Spotlight Sidebar --- */
+.spotlight {
+  position: sticky;
+  top: 6.5rem;
+  /* Aligns with header height */
+  height: fit-content;
+  align-self: flex-start;
+  transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.spotlight>section {
+  transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight>section:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.4);
+}
+
+/* Button & Link Global Slowdowns scoped to Dashboard */
+.dashboardLayout button,
+.dashboardLayout a {
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* --- Enhanced Card Interactions --- */
+.card:hover .cardTitle {
+  color: hsl(var(--primary));
+  transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cardBadge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Smooth Sidebar Transitions --- */
+.navLink svg {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navLink:hover svg {
+  transform: translateX(4px) scale(1.1);
+}
+
+.navLink.active svg {
+  transform: scale(1.15);
+}
+
+/* --- Premium Focus States --- */
+.dashboardLayout *:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 4px;
+  border-radius: 0.75rem;
+  transition: outline 0.3s ease;
+}
+
+/* --- Glow Effect on Active Elements --- */
+.navLink.active::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, hsl(var(--primary)), transparent);
+  border-radius: 1.25rem;
+  opacity: 0.15;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+/* --- Enhanced Empty State --- */
+.emptyState::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.1), transparent 70%);
+  filter: blur(60px);
+  animation: pulse-glow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* --- Smooth Logo Animation --- */
+.logo {
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 12px hsl(var(--primary) / 0.3));
+}
+
+/* --- Card Footer Enhancement --- */
+.cardFooter {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .cardFooter {
+  border-top-color: hsl(var(--primary) / 0.2);
+}
