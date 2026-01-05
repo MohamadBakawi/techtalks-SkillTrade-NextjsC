@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../context/ThemeContext";
@@ -97,6 +97,13 @@ export const metadata: Metadata = {
     // google: 'google-site-verification-code',
     // yandex: 'yandex-verification-code',
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 import { Toaster } from "@/components/ui/toaster";

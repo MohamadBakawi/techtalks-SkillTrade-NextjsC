@@ -3,12 +3,15 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
+import { MediaType } from "@prisma/client";
+
+export type MessageMediaType = "IMAGE" | "VIDEO" | "DOCUMENT";
 
 export async function sendMessage(params: {
     swapId: string;
     content: string;
     mediaUrl?: string;
-    mediaType?: string;
+    mediaType?: MessageMediaType;
 }) {
     const userId = await getCurrentUserId();
     if (!userId) throw new Error("Not authenticated");
@@ -38,7 +41,7 @@ export async function sendMessage(params: {
             receiverId: receiverId,
             swapId: params.swapId,
             mediaUrl: params.mediaUrl,
-            mediaType: params.mediaType,
+            mediaType: params.mediaType as MediaType,
         },
     });
 
@@ -114,6 +117,22 @@ export async function getSwapMessages(swapId: string) {
         orderBy: { createdAt: "asc" },
         include: {
             sender: true,
+        },
+    });
+}
+
+export async function markMessagesAsRead(swapId: string) {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new Error("Not authenticated");
+
+    return prisma.message.updateMany({
+        where: {
+            swapId,
+            receiverId: userId,
+            isRead: false,
+        },
+        data: {
+            isRead: true,
         },
     });
 }

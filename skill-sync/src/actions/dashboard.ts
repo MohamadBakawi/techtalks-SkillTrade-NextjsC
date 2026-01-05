@@ -91,10 +91,17 @@ export async function getDashboardOverview() {
         },
         teacher: true,
         student: true,
-        reviews: true, // <-- FIX: Include the reviews for each swap
+        reviews: true,
+        messages: {
+          where: {
+            receiverId: userId,
+            isRead: false,
+          },
+          select: { id: true }
+        }
       },
       orderBy: { startedAt: "desc" },
-      take: 10,
+      take: 20,
     }),
   ]);
 

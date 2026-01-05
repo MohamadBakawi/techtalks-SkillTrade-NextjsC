@@ -146,8 +146,16 @@ model Message {
   receiver  User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
   swapId    String
   swap      Swap     @relation(fields: [swapId], references: [id], onDelete: Cascade)
+  mediaUrl  String?
+  mediaType MediaType?
   createdAt DateTime @default(now())
   isRead    Boolean  @default(false)
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
 }
 
 model Notification {

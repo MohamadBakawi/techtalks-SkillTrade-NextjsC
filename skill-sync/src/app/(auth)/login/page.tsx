@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Zap, ArrowLeft } from "lucide-react";
+import { Loader2, Zap, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const container = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -174,13 +175,20 @@ export default function LoginPage() {
                 <div className="relative overflow-hidden rounded-2xl">
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="h-18 rounded-2xl bg-background/20 border-2 border-white/5 focus:border-primary/40 focus:bg-background/40 transition-all px-8 font-bold text-lg placeholder:text-muted-foreground/20"
+                    className="h-18 rounded-2xl bg-background/20 border-2 border-white/5 focus:border-primary/40 focus:bg-background/40 transition-all pl-8 pr-16 font-bold text-lg placeholder:text-muted-foreground/20"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-primary transition-colors z-20"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                   <div className="absolute inset-0 border border-white/5 rounded-2xl pointer-events-none" />
                 </div>
               </div>

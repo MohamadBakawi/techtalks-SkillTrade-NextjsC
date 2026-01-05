@@ -206,86 +206,35 @@ export default function DashboardClientContent({
   }
 
   useGSAP(() => {
-    // Coordinated layout entrance (The "Walking" Effect)
+    // Entrance Animation - Simplified to Opacity Only to prevent Sticky/Transform conflicts
     const tl = gsap.timeline();
     tl.fromTo(`.${styles.sidebar}`,
-      { x: -50, opacity: 0 },
-      { x: 0, opacity: 1, duration: 1.4, ease: "expo.out" }
+      { opacity: 0 },
+      { opacity: 1, duration: 1.0, ease: "power2.out" }
     )
       .fromTo(`.${styles.header}`,
-        { y: -30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, ease: "expo.out" },
-        "-=1.1"
+        { opacity: 0 },
+        { opacity: 1, duration: 0.8, ease: "power2.out" },
+        "-=0.6"
       )
       .fromTo(`.${styles.mainContent}`,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.6, ease: "expo.out" },
-        "-=1.1"
+        { opacity: 0 },
+        { opacity: 1, duration: 1.0, ease: "power2.out" },
+        "-=0.6"
       );
 
-    // Scroll-based "Walking" effect for unscrollable content
-    gsap.to(`.${styles.sidebar}`, {
-      scrollTrigger: {
-        trigger: container.current,
-        scroller: `.${styles.mainContent}`,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1.5,
-      },
-      y: 35, // More pronounced walking movement
-      ease: "none"
-    });
+    // Scroll-based parallax removed to prevent jitter/glitching with sticky positioning.
+    // Sticky positioning handles the layouts behavior natively and smoother.
 
-    gsap.to(`.${styles.spotlight}`, {
-      scrollTrigger: {
-        trigger: container.current,
-        scroller: `.${styles.mainContent}`,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 2,
-      },
-      y: 50, // Spotlight walks at a different pace for parallax feel
-      ease: "none"
-    });
-
-    gsap.to(`.${styles.header}`, {
-      scrollTrigger: {
-        trigger: container.current,
-        scroller: `.${styles.mainContent}`,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1.2,
-      },
-      y: 20, // Header also walks slightly
-      ease: "none"
-    });
-
-  }, { scope: container, dependencies: [activeTab] });
+  }, { scope: container, dependencies: [activeTab, scrolled] });
 
   return (
     <div ref={container} className={styles.dashboardLayout}>
       {/* Mobile Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 lg:hidden animate-in fade-in duration-300"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
       <aside className={cn(
         styles.sidebar,
-        isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-        "fixed left-0 w-[280px] h-screen transition-all duration-700 z-50",
-        scrolled
-          ? "top-4 scale-[0.96] rounded-[3rem] h-[calc(100vh-2rem)] translate-x-4 bg-background/60 backdrop-blur-3xl border border-white/5 shadow-2xl"
-          : "top-0 lg:bg-transparent"
+        "lg:translate-x-0"
       )}>
-        <button
-          onClick={() => setIsSidebarOpen(false)}
-          className="lg:hidden absolute top-6 right-6 p-2 rounded-xl bg-muted/50 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
         <div className={styles.animateSlideInRight}>
           <Link href="/" className={cn(styles.logo, "flex items-center gap-3 hover:scale-110 transition-all group")}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center backdrop-blur-xl border border-primary/20 shadow-lg shadow-primary/10 overflow-hidden">
@@ -305,7 +254,15 @@ export default function DashboardClientContent({
           <p className={cn(styles.navGroupTitle, styles.animateSlideInRight)} style={{ animationDelay: '100ms' }}>Platform</p>
           <NavLink href="/dashboard?tab=browse" active={activeTab === "browse"} icon={<Layers className="w-5 h-5" />} label="Browse" activeTab={activeTab} setIsSidebarOpen={setIsSidebarOpen} />
           <NavLink href="/dashboard?tab=my-proposals" active={activeTab === "my-proposals"} icon={<Zap className="w-5 h-5" />} label="My Proposals" activeTab={activeTab} setIsSidebarOpen={setIsSidebarOpen} />
-          <NavLink href="/dashboard?tab=active-swaps" active={activeTab === "active-swaps"} icon={<MessageSquare className="w-5 h-5" />} label="Active Swaps" activeTab={activeTab} setIsSidebarOpen={setIsSidebarOpen} />
+          <NavLink
+            href="/dashboard?tab=active-swaps"
+            active={activeTab === "active-swaps"}
+            icon={<MessageSquare className="w-5 h-5" />}
+            label="Active Swaps"
+            activeTab={activeTab}
+            setIsSidebarOpen={setIsSidebarOpen}
+            count={swaps.reduce((acc, s) => acc + ((s as any).messages?.length || 0), 0)}
+          />
           <NavLink href="/dashboard?tab=leaderboard" active={activeTab === "leaderboard"} icon={<Trophy className="w-5 h-5" />} label="Leaderboard" activeTab={activeTab} setIsSidebarOpen={setIsSidebarOpen} />
         </nav>
 
@@ -340,35 +297,33 @@ export default function DashboardClientContent({
         </div>
       </aside>
 
-      <main className={styles.mainContent}>
+      <main className={cn(styles.mainContent, "pb-24 lg:pb-10")}>
         <header className={cn(
           styles.header,
           "sticky top-0 z-[40] transition-all duration-700 px-8 rounded-[2.5rem] flex items-center justify-between",
           scrolled
             ? "py-4 bg-background/60 backdrop-blur-2xl shadow-2xl border border-white/5 scale-[0.98] mt-4"
-            : "py-10 bg-transparent"
+            : "py-6 sm:py-10 bg-transparent"
         )}>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-3 rounded-2xl bg-muted/50 border border-border/50 text-foreground hover:text-primary hover:bg-primary/5 transition-all active:scale-95"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
             <div>
               <h1 className={styles.headerTitle}>{tabTitle}</h1>
-              <p className="text-muted-foreground mt-1 flex items-center gap-2">
+              <p className="text-muted-foreground mt-1 flex items-center gap-2 text-xs sm:text-base">
                 Welcome back, <span className="font-extrabold text-primary uppercase tracking-tight">{overview.user?.name || "User"}</span>!
               </p>
             </div>
           </div>
           <div className={styles.headerActions}>
-            <div className="flex bg-muted/50 p-1 rounded-xl border border-border">
+            <div className="flex bg-muted/50 p-1 rounded-xl border border-border hidden sm:flex">
+              <NavSearchButton />
+            </div>
+            {/* Mobile simplified header actions */}
+            <div className="sm:hidden">
               <NavSearchButton />
             </div>
             <PostProposalModal />
             <div className="flex items-center gap-2 ml-2 pl-4 border-l border-border/50">
-              <ThemeCustomizer />
+              <div className="hidden sm:block"><ThemeCustomizer /></div>
               <Notifications notifications={notifications} unreadCount={unreadCount} handleMarkRead={handleMarkRead} />
               <UserMenu user={overview.user} />
             </div>
@@ -382,6 +337,39 @@ export default function DashboardClientContent({
           {activeTab === "leaderboard" && <LeaderboardTabContent leaderboard={overview.leaderboard} />}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation - Enhanced */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-background/60 backdrop-blur-2xl border-t border-white/10 lg:hidden pb-safe safe-area-inset-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+        <div className="flex justify-around items-center h-20 px-4">
+          <Link href="/dashboard?tab=browse" className={cn("flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all duration-300 w-16 active:scale-90", activeTab === "browse" ? "text-primary" : "text-muted-foreground opacity-60 hover:opacity-100")}>
+            <div className={cn("p-1.5 rounded-xl transition-all", activeTab === "browse" ? "bg-primary/10" : "")}>
+              <Layers className={cn("w-6 h-6", activeTab === "browse" && "fill-current")} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest scale-90">Browse</span>
+          </Link>
+          <Link href="/dashboard?tab=my-proposals" className={cn("flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all duration-300 w-16 active:scale-90", activeTab === "my-proposals" ? "text-primary" : "text-muted-foreground opacity-60 hover:opacity-100")}>
+            <div className={cn("p-1.5 rounded-xl transition-all", activeTab === "my-proposals" ? "bg-primary/10" : "")}>
+              <Zap className={cn("w-6 h-6", activeTab === "my-proposals" && "fill-current")} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest scale-90">Me</span>
+          </Link>
+          <Link href="/dashboard?tab=active-swaps" className={cn("relative flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all duration-300 w-16 active:scale-90", activeTab === "active-swaps" ? "text-primary" : "text-muted-foreground opacity-60 hover:opacity-100")}>
+            <div className={cn("relative p-1.5 rounded-xl transition-all", activeTab === "active-swaps" ? "bg-primary/10" : "")}>
+              <MessageSquare className={cn("w-6 h-6", activeTab === "active-swaps" && "fill-current")} />
+              {swaps.reduce((acc, s) => acc + ((s as any).messages?.length || 0), 0) > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
+              )}
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest scale-90">Syncs</span>
+          </Link>
+          <Link href="/dashboard?tab=leaderboard" className={cn("flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all duration-300 w-16 active:scale-90", activeTab === "leaderboard" ? "text-primary" : "text-muted-foreground opacity-60 hover:opacity-100")}>
+            <div className={cn("p-1.5 rounded-xl transition-all", activeTab === "leaderboard" ? "bg-primary/10" : "")}>
+              <Trophy className={cn("w-6 h-6", activeTab === "leaderboard" && "fill-current")} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest scale-90">Top</span>
+          </Link>
+        </div>
+      </div>
       <Dialog open={isReviewModalOpen} onOpenChange={setReviewModalOpen}>
         <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl bg-background">
           <div className="bg-gradient-to-br from-primary/10 via-background to-background p-10 py-12">
@@ -500,12 +488,19 @@ const SwapCard = React.memo(({ swap, partner, currentUserId, onComplete, onCance
 
         {/* Action Buttons Section */}
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 relative z-10">
-          <ChatModal
-            swapId={swap.id}
-            currentUserId={currentUserId}
-            otherUserName={partner.name}
-            triggerClassName="h-14 md:h-16 rounded-2xl bg-primary text-white hover:bg-primary/90 shadow-[0_15px_30px_rgba(var(--primary),0.3)] border-none px-6 md:px-8 font-black uppercase tracking-widest text-xs flex-1 sm:flex-none transition-all hover:scale-[1.05] active:scale-95"
-          />
+          <div className="relative flex-1 sm:flex-none">
+            <ChatModal
+              swapId={swap.id}
+              currentUserId={currentUserId}
+              otherUserName={partner.name}
+              triggerClassName="h-14 md:h-16 rounded-2xl bg-primary text-white hover:bg-primary/90 shadow-[0_15px_30px_rgba(var(--primary),0.3)] border-none px-6 md:px-8 font-black uppercase tracking-widest text-xs transition-all hover:scale-[1.05] active:scale-95"
+            />
+            {(swap as any).messages?.length > 0 && (
+              <div className="absolute -top-2 -right-2 bg-rose-500 text-white min-w-[24px] h-[24px] rounded-full flex items-center justify-center text-[10px] font-black border-2 border-background animate-bounce-slow shadow-lg shadow-rose-500/30 z-20">
+                {(swap as any).messages.length}
+              </div>
+            )}
+          </div>
           {swap.status === 'ACTIVE' && (
             <Button
               onClick={() => onComplete(swap.id)}
@@ -649,7 +644,7 @@ const ActiveSwapsTabContent = ({ applications, swaps, user, handleAccept, handle
 // --- Other Helper Components (Unchanged) ---
 
 // --- Moved NavLink outside to fix render issues ---
-const NavLink = ({ id, label, icon: Icon, delay = 0, href, active, activeTab, setIsSidebarOpen }: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+const NavLink = ({ id, label, icon: Icon, delay = 0, href, active, activeTab, setIsSidebarOpen, count }: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const isActive = active !== undefined ? active : activeTab === id;
   const finalHref = href || `?tab=${id}`;
 
@@ -665,24 +660,31 @@ const NavLink = ({ id, label, icon: Icon, delay = 0, href, active, activeTab, se
         "group"
       )}
     >
-      {React.isValidElement(Icon) ? (
-        <span className={cn(
-          "transition-colors",
-          isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
-        )}>
-          {Icon}
-        </span>
-      ) : (
-        <Icon
-          className={cn(
-            "w-5 h-5 transition-colors",
+      <div className="flex items-center gap-3 flex-1">
+        {React.isValidElement(Icon) ? (
+          <span className={cn(
+            "transition-colors",
             isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
-          )}
-        />
+          )}>
+            {Icon}
+          </span>
+        ) : (
+          <Icon
+            className={cn(
+              "w-5 h-5 transition-colors",
+              isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
+            )}
+          />
+        )}
+        <span className={cn("font-bold tracking-tight", isActive ? "text-primary-foreground" : "group-hover:text-primary")}>{label}</span>
+      </div>
+      {count > 0 && (
+        <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md min-w-[1.2rem] text-center shadow-lg shadow-rose-500/20 mr-2">
+          {count}
+        </span>
       )}
-      <span className={cn("font-bold tracking-tight", isActive ? "text-primary-foreground" : "group-hover:text-primary")}>{label}</span>
       {isActive && (
-        <span className="ml-auto w-2 h-2 bg-primary-foreground rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+        <span className="w-2 h-2 bg-primary-foreground rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
       )}
     </Link>
   );
@@ -699,30 +701,49 @@ const BrowseTabContent = ({ publicOnlyProposals, scrolled }: { publicOnlyProposa
     <div className="flex flex-col lg:flex-row gap-10 animate-in fade-in slide-in-from-bottom-12 duration-[1500ms] ease-out">
       <div className="flex-1 space-y-10">
         {/* Skill Explorer Header */}
-        <section className="p-8 rounded-[3rem] bg-gradient-to-br from-primary/10 via-background to-background border border-primary/20 shadow-2xl shadow-primary/5 relative overflow-hidden group">
+        <section className="p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] bg-gradient-to-br from-primary/10 via-background to-background border border-primary/20 shadow-2xl shadow-primary/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-[1200ms]">
-            <Layers className="w-48 h-48" />
+            <Layers className="w-32 h-32 sm:w-48 sm:h-48" />
           </div>
           <div className="relative z-10">
-            <h2 className="text-4xl font-black text-foreground mb-4 tracking-tighter">Skill Explorer</h2>
-            <p className="text-muted-foreground font-medium max-w-md mb-8 text-lg opacity-80">Discover over 150 unique skills being traded right now by experts around the globe.</p>
-            <div className="flex flex-wrap gap-3">
+            <h2 className="text-3xl sm:text-4xl font-black text-foreground mb-4 tracking-tighter">Skill Explorer</h2>
+            <p className="text-muted-foreground font-medium max-w-md mb-8 text-sm sm:text-lg opacity-80">Discover over 150 unique skills being traded right now by experts around the globe.</p>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {["React", "UI Design", "Python", "Marketing", "Piano", "Cooking"].map((skill, i) => (
                 <Badge
                   key={skill}
                   variant="secondary"
-                  className="px-6 py-3 rounded-2xl bg-background border-border hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer font-black text-sm shadow-xl shadow-black/5 hover:-translate-y-1"
+                  className="px-4 py-2 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl bg-background border-border hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer font-black text-xs sm:text-sm shadow-xl shadow-black/5 hover:-translate-y-1"
                   style={{ animationDelay: `${i * 100}ms` }}
                 >
                   {skill}
                 </Badge>
               ))}
-              <Badge variant="outline" className="px-4 py-2 rounded-xl font-black italic opacity-50 border-dashed">
-                + 144 more
-              </Badge>
             </div>
           </div>
         </section>
+
+        {/* Mobile-Only Top Mentors Preview */}
+        <div className="lg:hidden space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Top Mentors</h3>
+            <Link href="/dashboard?tab=leaderboard" className="text-xs font-bold text-primary hover:underline">View All</Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 px-2 snap-x">
+            {sortedByRep.map((p) => (
+              <Link href={`/profile/${p.ownerId}`} key={p.id} className="snap-start min-w-[240px] p-4 rounded-3xl bg-card border border-border flex items-center gap-4 shadow-sm">
+                <Avatar className="h-12 w-12 border border-border">
+                  <AvatarImage src={p.owner?.avatarUrl || ""} />
+                  <AvatarFallback className="font-bold text-sm">{(p.owner?.name?.[0] || "U")}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-bold truncate text-sm">{p.owner?.name}</span>
+                  <span className="text-[10px] uppercase font-black text-primary">{p.owner?.reputation?.title || "Member"}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* Main Feed */}
         <div className={styles.cardGrid}>

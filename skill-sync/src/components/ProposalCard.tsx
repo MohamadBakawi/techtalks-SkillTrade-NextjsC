@@ -88,7 +88,7 @@ export function ProposalCard({
       </div>
 
       {/* Content Section */}
-      <div className="flex-grow p-8 flex flex-col">
+      <div className="flex-grow p-6 sm:p-8 flex flex-col">
         {/* Visual Accent Line */}
         <div className="absolute top-0 left-0 w-1 h-1/2 bg-primary rounded-full opacity-30 group-hover:h-full transition-all duration-700" />
 

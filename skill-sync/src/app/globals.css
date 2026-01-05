@@ -167,11 +167,10 @@ html {
     height: auto;
   }
 
-  /* GPU acceleration for transforms */
-  [class*="transition"],
+  /* GPU acceleration for transforms - OPTIMIZED */
   [class*="animate"],
-  [class*="hover:"] {
-    will-change: auto;
+  .gpu-accelerated {
+    will-change: transform, opacity;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
